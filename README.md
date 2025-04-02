@@ -12,6 +12,7 @@ Amazon Q Developer is an AI-powered assistant that helps developers build on AWS
   - [Development VPC with private subnet](/dev-vpc-with-private-subnet): Create a VPC with private subnets for testing instances
   - [Remote Development Server Without SSH](/remote-dev-server-without-ssh): Setup remote development environments in the private subnet and access through SSM
   - [SageMaker AI Notebook](/Sagemaker-AI-notebook): Create a notebook for testing a sample repo from Github. 
+  - [Extracting Data from Unstructured Documents](/extracting-data-from-unstructured-documents): Creates a Jupyter Notebook to extract data from unstructured documents.
 
 ## Getting Started with Amazon Q Developer
 
