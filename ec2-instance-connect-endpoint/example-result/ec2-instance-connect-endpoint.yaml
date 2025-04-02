@@ -1,0 +1,109 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'EC2 Instance Connect Endpoint with Security Groups for secure SSH access'
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Network Configuration"
+        Parameters:
+          - VpcId
+          - SubnetId
+          - VpcCidr
+      - Label:
+          default: "Environment Configuration"
+        Parameters:
+          - EnvironmentName
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC where the EC2 Instance Connect Endpoint will be deployed
+
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet where the EC2 Instance Connect Endpoint will be deployed
+
+  VpcCidr:
+    Type: String
+    Description: CIDR range of the VPC
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
+
+  EnvironmentName:
+    Type: String
+    Description: Environment name for resource tagging
+    AllowedValues:
+      - development
+      - staging
+      - production
+    Default: development
+
+Resources:
+  # Security Group for EC2 Instance Connect Endpoint
+  EICEndpointSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for EC2 Instance Connect Endpoint
+      VpcId: !Ref VpcId
+      SecurityGroupEgress:
+        - Description: Allow outbound SSH to EC2 instances
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref VpcCidr
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-eic-endpoint-sg
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+  # Security Group for Target EC2 Instances
+  EC2InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for target EC2 instances
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - Description: Allow inbound SSH from EC2 Instance Connect Endpoint
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourceSecurityGroupId: !Ref EICEndpointSecurityGroup
+      SecurityGroupEgress:
+        - Description: Allow all outbound traffic
+          IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-ec2-instance-sg
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+  # EC2 Instance Connect Endpoint
+  EC2InstanceConnectEndpoint:
+    Type: AWS::EC2::InstanceConnectEndpoint
+    Properties:
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds: 
+        - !Ref EICEndpointSecurityGroup
+      PreserveClientIp: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-eic-endpoint
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+Outputs:
+  EC2InstanceConnectEndpointId:
+    Description: ID of the EC2 Instance Connect Endpoint
+    Value: !Ref EC2InstanceConnectEndpoint
+
+  EICEndpointSecurityGroupId:
+    Description: Security Group ID for EC2 Instance Connect Endpoint
+    Value: !Ref EICEndpointSecurityGroup
+
+  EC2InstanceSecurityGroupId:
+    Description: Security Group ID for EC2 Instances
+    Value: !Ref EC2InstanceSecurityGroup
