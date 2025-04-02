@@ -5,7 +5,7 @@ Use this prompt with in your IDE extension or plugin with the [```/dev``` comman
 
 ### Prompt
 The prompt contains requirements for setting up:
-- A CloudFormation template (dev-vpc.yaml) that creates a vpc with only a private subnet and NAT gateway.
+- A CloudFormation template (dev-vpc.yaml) that creates a vpc with a private subnet and NAT gateway.
 - An accompanying INSTRUCTIONS.md file with detailed setup and usage documentation
 
 ```
