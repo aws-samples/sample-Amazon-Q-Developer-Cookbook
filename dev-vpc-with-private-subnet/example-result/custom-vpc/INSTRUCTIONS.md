@@ -31,6 +31,7 @@ aws configure
 
 2. Run the deployment script:
 ```bash
+chmod 700 deploy.sh
 ./deploy.sh
 ```
 
@@ -76,6 +77,7 @@ To remove all resources:
 
 1. Using the cleanup script:
 ```bash
+chmod 700 cleanup.sh
 ./cleanup.sh
 ```
 
