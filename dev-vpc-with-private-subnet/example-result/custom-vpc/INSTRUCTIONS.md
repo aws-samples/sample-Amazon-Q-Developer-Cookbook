@@ -5,7 +5,7 @@ This guide provides instructions for deploying a secure VPC infrastructure using
 ## Architecture Overview
 
 The template creates the following resources:
-- VPC named 'remote-dev-vpc'
+- VPC named 'custom-vpc'
 - Two private subnets in different availability zones
 - NAT Gateway for outbound internet connectivity
 - Associated route tables and network configuration
@@ -46,17 +46,17 @@ If you prefer to deploy manually:
 
 ```bash
 aws cloudformation create-stack \
-  --stack-name dev-vpc \
-  --template-body file://dev-vpc.yaml \
+  --stack-name custom-vpc \
+  --template-body file://custom-vpc.yaml \
   --capabilities CAPABILITY_IAM
 
 # Wait for stack completion
 aws cloudformation wait stack-create-complete \
-  --stack-name dev-vpc
+  --stack-name custom-vpc
 
 # Get stack outputs
 aws cloudformation describe-stacks \
-  --stack-name dev-vpc \
+  --stack-name custom-vpc \
   --query 'Stacks[0].Outputs'
 ```
 
@@ -66,7 +66,7 @@ To retrieve the VPC ID after deployment:
 
 ```bash
 aws cloudformation describe-stacks \
-  --stack-name dev-vpc \
+  --stack-name custom-vpc \
   --query 'Stacks[0].Outputs[?OutputKey==`VpcId`].OutputValue' \
   --output text
 ```
@@ -83,8 +83,8 @@ chmod 700 cleanup.sh
 
 2. Manual cleanup:
 ```bash
-aws cloudformation delete-stack --stack-name dev-vpc
-aws cloudformation wait stack-delete-complete --stack-name dev-vpc
+aws cloudformation delete-stack --stack-name custom-vpc
+aws cloudformation wait stack-delete-complete --stack-name custom-vpc
 ```
 
 ## Security Considerations
